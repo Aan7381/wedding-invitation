@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11120f">
+  <meta name="description" content="The wedding invitation of Isti & Adrian — 15 November 2026.">
+  <title>Isti & Adrian — Wedding Invitation</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="music-control" aria-label="Music control">
+    <button id="musicButton" class="icon-button" aria-label="Play wedding music" aria-pressed="false">
+      <span class="music-icon">♪</span>
+    </button>
+  </div>
+  <audio id="weddingMusic" loop preload="none" src=""></audio>
+
+  <main>
+    <section class="hero section-dark" id="home">
+      <img id="heroImage" class="hero__image" src="" alt="Isti & Adrian" fetchpriority="high">
+      <div class="hero__veil"></div>
+      <div class="hero__content">
+        <p class="eyebrow">THE WEDDING OF</p>
+        <h1><span id="heroBride">Isti</span><i>&</i><span id="heroGroom">Adrian</span></h1>
+        <p class="hero__date" id="heroDate"></p>
+        <a class="scroll-cue" href="#couple" aria-label="Scroll to invitation">↓</a>
+      </div>
+    </section>
+
+    <section class="intro section-light">
+      <div class="ornament">✦</div>
+      <p class="eyebrow">WITH LOVE & GRATITUDE</p>
+      <h2>We invite you to<br><em>celebrate with us</em></h2>
+      <p class="body-copy">Two people, two families, one beautiful beginning. Your presence and prayers will make this day even more meaningful.</p>
+    </section>
+
+    <section class="couple section-dark" id="couple">
+      <div class="section-heading">
+        <p class="eyebrow">THE COUPLE</p>
+        <h2>Isti <em>&</em> Adrian</h2>
+      </div>
+      <div class="couple-card">
+        <div class="couple-photo-wrap">
+          <img id="coupleImage" src="" alt="Isti & Adrian" loading="lazy">
+        </div>
+        <div class="names">
+          <h3 id="brideName"></h3>
+          <p>Putri dari</p>
+          <strong id="brideParents"></strong>
+          <span class="amp">&</span>
+          <h3 id="groomName"></h3>
+          <p>Putra dari</p>
+          <strong id="groomParents"></strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="countdown section-accent">
+      <p class="eyebrow">COUNTING THE DAYS</p>
+      <h2>Until we say <em>“I do”</em></h2>
+      <div class="countdown-grid" aria-live="polite">
+        <div><strong id="days">00</strong><span>Days</span></div>
+        <div><strong id="hours">00</strong><span>Hours</span></div>
+        <div><strong id="minutes">00</strong><span>Minutes</span></div>
+        <div><strong id="seconds">00</strong><span>Seconds</span></div>
+      </div>
+    </section>
+
+    <section class="event section-light" id="event">
+      <div class="section-heading">
+        <p class="eyebrow">SAVE THE DATE</p>
+        <h2>A day to <em>remember</em></h2>
+      </div>
+      <div class="event-date">
+        <span id="eventDate"></span>
+        <span id="eventTime"></span>
+      </div>
+      <div class="event-card">
+        <span class="event-card__label">VENUE</span>
+        <h3 id="venueName"></h3>
+        <p id="venueAddress"></p>
+        <a id="mapsLink" class="text-link" href="#" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+      </div>
+      <a id="calendarLink" class="button button-dark" href="#" target="_blank" rel="noopener">＋ Add to Google Calendar</a>
+    </section>
+
+    <section class="gallery section-dark">
+      <div class="gallery-grid">
+        <figure class="gallery__large"><img id="galleryWide" src="" alt="Isti & Adrian" loading="lazy"></figure>
+        <figure><img id="galleryBride" src="" alt="Isti" loading="lazy"></figure>
+        <figure><img id="galleryGroom" src="" alt="Adrian" loading="lazy"></figure>
+        <figure class="gallery__wide"><img id="galleryClose" src="" alt="Isti & Adrian" loading="lazy"></figure>
+      </div>
+    </section>
+
+    <section class="rsvp section-light" id="rsvp">
+      <div class="section-heading">
+        <p class="eyebrow">RSVP</p>
+        <h2>Will you join <em>us?</em></h2>
+        <p class="body-copy">Please let us know your attendance. We can't wait to celebrate together.</p>
+      </div>
+
+      <form id="rsvpForm" class="rsvp-form">
+        <label>Full Name
+          <input type="text" name="name" required maxlength="80" autocomplete="name" placeholder="Your full name">
+        </label>
+        <fieldset>
+          <legend>Attendance confirmation</legend>
+          <div class="segmented">
+            <label><input type="radio" name="attendance" value="Attending" checked><span>Attending</span></label>
+            <label><input type="radio" name="attendance" value="Not Attending"><span>Not attending</span></label>
+          </div>
+        </fieldset>
+        <label>Number of guests attending
+          <select name="guests" id="guestCount">
+            <option value="1">1 guest</option><option value="2">2 guests</option>
+            <option value="3">3 guests</option><option value="4">4 guests</option>
+            <option value="5">5 guests</option><option value="6">6 guests</option>
+          </select>
+        </label>
+        <label>Wishes & messages
+          <textarea name="message" required maxlength="500" rows="5" placeholder="Write a little wish for the bride & groom…"></textarea>
+        </label>
+        <button class="button button-dark" type="submit" id="submitButton">Send RSVP</button>
+        <p class="form-status" id="formStatus" role="status"></p>
+      </form>
+    </section>
+
+    <section class="wishes section-accent" id="wishes">
+      <div class="section-heading">
+        <p class="eyebrow">WEDDING WISHES</p>
+        <h2>Words from <em>you</em></h2>
+      </div>
+      <div id="wishesList" class="wishes-list">
+        <div class="empty-state">Loading wishes…</div>
+      </div>
+    </section>
+
+    <section class="gift section-light" id="gift">
+      <div class="section-heading">
+        <p class="eyebrow">A LITTLE SOMETHING</p>
+        <h2>Wanna give us <em>some gifts?</em></h2>
+        <p class="body-copy">Your presence is the greatest gift. If you'd like to send a little something, we've made it simple below.</p>
+      </div>
+      <div class="gift-list">
+        <article class="gift-card">
+          <span class="gift-label" id="bank1Name"></span>
+          <strong id="bank1Number"></strong>
+          <small id="bank1Holder"></small>
+          <button class="copy-button" data-copy-target="bank1Number">Copy account number</button>
+        </article>
+        <article class="gift-card">
+          <span class="gift-label" id="bank2Name"></span>
+          <strong id="bank2Number"></strong>
+          <small id="bank2Holder"></small>
+          <button class="copy-button" data-copy-target="bank2Number">Copy account number</button>
+        </article>
+        <article class="gift-card gift-card--address">
+          <span class="gift-label">GIFT DELIVERY</span>
+          <p id="giftAddress"></p>
+          <button class="copy-button" data-copy-target="giftAddress">Copy address</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing section-dark">
+      <div class="closing__photo"><img id="closingImage" src="" alt="Isti & Adrian" loading="lazy"></div>
+      <div class="closing__content">
+        <p class="eyebrow">SEE YOU THERE</p>
+        <h2>With love,<br><em>Isti & Adrian</em></h2>
+        <p>Thank you for being part of our story.</p>
+        <a href="#home" class="text-link light">Back to top ↑</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
