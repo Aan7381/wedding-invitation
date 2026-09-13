@@ -4,7 +4,14 @@
   const $ = (s) => document.querySelector(s);
 
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
-  const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = src; };
+  const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = normalizeAssetPath(src); };
+
+  // The GitHub Pages repo currently stores media at the repository root.
+  // Keep config.js compatible with the original /assets paths as well.
+  function normalizeAssetPath(src) {
+    if (!src) return "";
+    return String(src).replace(/^\.\/?assets\/images\//, "").replace(/^\.\/?assets\/audio\//, "");
+  }
 
   // Content
   text("heroBride", C.couple.bride.split(" ")[0]);
@@ -101,8 +108,6 @@
 
   function loadLocalWishes() { renderWishes(readLocal()); }
 
-  // JSONP keeps the public static GitHub Pages frontend compatible with Apps Script
-  // even where browser CORS handling is restrictive.
   function loadRemoteWishes() {
     if (!C.googleAppsScriptUrl) { loadLocalWishes(); return; }
     const cb = `weddingWishes_${Date.now()}`;
@@ -144,7 +149,6 @@
 
     if (C.googleAppsScriptUrl) {
       try {
-        // Simple URL-encoded POST avoids a CORS preflight.
         const body = new URLSearchParams(item);
         await fetch(C.googleAppsScriptUrl, {
           method:"POST", mode:"no-cors",
@@ -161,7 +165,6 @@
     submit.disabled = false; submit.textContent = "Send RSVP";
   });
 
-  // Copy-to-clipboard gift helpers
   document.querySelectorAll(".copy-button").forEach(btn => {
     btn.addEventListener("click", async () => {
       const target = document.getElementById(btn.dataset.copyTarget);
@@ -174,17 +177,46 @@
     });
   });
 
-  // Music: mobile browsers require a user gesture.
+  // Music: attempt autoplay immediately. Modern browsers may block unmuted
+  // autoplay; in that case the first tap/click/keypress starts it automatically.
   const audio = $("#weddingMusic"), musicButton = $("#musicButton"), musicControl = $(".music-control");
-  audio.src = C.assets.music;
+  audio.src = normalizeAssetPath(C.assets.music);
+  audio.preload = "auto";
+  audio.autoplay = true;
+
+  async function startMusic() {
+    try {
+      await audio.play();
+      musicButton.setAttribute("aria-pressed","true");
+      musicButton.setAttribute("aria-label","Pause wedding music");
+      musicControl.classList.add("playing");
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // This works on browsers that allow autoplay and also satisfies browser
+  // policies that require a user gesture without leaving the user wondering.
+  startMusic();
+  ["pointerdown", "touchstart", "keydown"].forEach(eventName => {
+    window.addEventListener(eventName, () => {
+      if (audio.paused) startMusic();
+    }, { once: true, passive: true });
+  });
+
   musicButton.addEventListener("click", async () => {
     try {
-      if (audio.paused) { await audio.play(); musicButton.setAttribute("aria-pressed","true"); musicControl.classList.add("playing"); }
-      else { audio.pause(); musicButton.setAttribute("aria-pressed","false"); musicControl.classList.remove("playing"); }
+      if (audio.paused) await startMusic();
+      else {
+        audio.pause();
+        musicButton.setAttribute("aria-pressed","false");
+        musicButton.setAttribute("aria-label","Play wedding music");
+        musicControl.classList.remove("playing");
+      }
     } catch { status.textContent = "Tap the music button again to start the song."; }
   });
 
-  // Subtle reveal animations
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); } });
   }, {threshold:.12});
