@@ -15,7 +15,7 @@ window.WEDDING_CONFIG = {
     startISO: "2026-11-15T09:00:00+07:00",
     endISO: "2026-11-15T14:00:00+07:00",
     title: "The Wedding of Isti & Adrian",
-    venue: "Bugel Mas Indah",
+    venue: "Kediaman Mempelai Wanita",
     address: "Jalan Pasundan Blok D2 No 21 RT:06/RW:05 Kel. Bugel, Kec. Karawaci, Kota Tangerang",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bugel+Mas+Indah+Jalan+Pasundan+Blok+D2+No+21+RT%3A06%2FRW%3A05+Kel.+Bugel+Kec.+Karawaci+Kota+Tangerang",
     calendarDescription: "We would be honored to celebrate this special day with you.\n\nThe Wedding of Isti & Adrian"
@@ -30,7 +30,7 @@ window.WEDDING_CONFIG = {
   // Paste your deployed Google Apps Script Web App URL here.
   // Leave blank while developing; RSVP will still work locally and be stored
   // in the browser as a fallback.
-  googleAppsScriptUrl: "",
+  googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbwXjJjNnM20zUwTem_xkEClevvhgScYX9r8-ChU9tHOTWDyCNi-_4Tv8cyxbFSz_eDu/exec",
 
   assets: {
     hero: "assets/images/hero.jpg",
