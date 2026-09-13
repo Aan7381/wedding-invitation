@@ -4,14 +4,7 @@
   const $ = (s) => document.querySelector(s);
 
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
-  const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = normalizeAssetPath(src); };
-
-  // The GitHub Pages repo currently stores media at the repository root.
-  // Keep config.js compatible with the original /assets paths as well.
-  function normalizeAssetPath(src) {
-    if (!src) return "";
-    return String(src).replace(/^\.\/?assets\/images\//, "").replace(/^\.\/?assets\/audio\//, "");
-  }
+  const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = src || ""; };
 
   // Content
   text("heroBride", C.couple.bride.split(" ")[0]);
@@ -180,7 +173,7 @@
   // Music: attempt autoplay immediately. Modern browsers may block unmuted
   // autoplay; in that case the first tap/click/keypress starts it automatically.
   const audio = $("#weddingMusic"), musicButton = $("#musicButton"), musicControl = $(".music-control");
-  audio.src = normalizeAssetPath(C.assets.music);
+  audio.src = C.assets.music || "";
   audio.preload = "auto";
   audio.autoplay = true;
 
@@ -196,8 +189,6 @@
     }
   }
 
-  // This works on browsers that allow autoplay and also satisfies browser
-  // policies that require a user gesture without leaving the user wondering.
   startMusic();
   ["pointerdown", "touchstart", "keydown"].forEach(eventName => {
     window.addEventListener(eventName, () => {
