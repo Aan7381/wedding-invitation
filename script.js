@@ -6,27 +6,26 @@
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
   const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = src || ""; };
 
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
+  }
+
   // Personalised invitation recipient from either ?to=Raka%20Rizky or
   // the clean path /wedding-invitation/Raka-Rizky.
   function getGuestName() {
     const params = new URLSearchParams(window.location.search);
     const queryName = params.get("to");
     if (queryName) return queryName.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
-
     const path = window.location.pathname.replace(/\/+$/, "");
     const parts = path.split("/").filter(Boolean);
     const slug = parts.length ? parts[parts.length - 1] : "";
     if (!slug || /^(index\.html|404\.html|wedding-invitation)$/i.test(slug)) return "";
-    try {
-      return decodeURIComponent(slug).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
-    } catch {
-      return slug.replace(/[-_]+/g, " ").trim();
-    }
+    try { return decodeURIComponent(slug).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim(); }
+    catch { return slug.replace(/[-_]+/g, " ").trim(); }
   }
 
   const guestName = getGuestName();
 
-  // Premium invitation entrance — also gives the browser a user gesture for music.
   const gate = document.createElement("div");
   gate.className = "invitation-gate";
   gate.innerHTML = `
@@ -35,8 +34,8 @@
       <div class="invitation-gate__rule"></div>
       <p>THE WEDDING OF</p>
       <h2>Isti & Adrian</h2>
-      ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
       <p>Minggu, 15 November 2026</p>
+      ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
       <button class="invitation-gate__open" type="button">Buka Undangan</button>
     </div>`;
   document.body.prepend(gate);
@@ -63,14 +62,48 @@
 
   img("heroImage", C.assets.hero);
   img("bridePortrait", C.assets.bride);
-  img("brideSecond", C.assets.brideSecond);
   img("groomPortrait", C.assets.groom);
-  img("groomSecond", C.assets.groomSecond);
   img("galleryWide", C.assets.galleryOne);
   img("galleryBride", C.assets.galleryTwo);
   img("galleryGroom", C.assets.engagementWide);
   img("galleryClose", C.assets.engagementClose);
   img("closingImage", C.assets.couple);
+
+  function buildCouplePhotoPairs() {
+    const people = [
+      { selector: ".couple-person--bride", src: C.assets.brideSecond, label: "THE BRIDE" },
+      { selector: ".couple-person--groom", src: C.assets.groomSecond, label: "THE GROOM" }
+    ];
+    people.forEach(person => {
+      const article = document.querySelector(person.selector);
+      const original = article?.querySelector(".couple-photo-wrap");
+      if (!article || !original || article.querySelector(".couple-photo-pair")) return;
+
+      original.classList.add("couple-photo-wrap--main");
+      const pair = document.createElement("div");
+      pair.className = "couple-photo-pair";
+      original.parentNode.insertBefore(pair, original);
+      pair.appendChild(original);
+
+      const secondary = document.createElement("div");
+      secondary.className = "couple-photo-wrap couple-photo-wrap--secondary";
+      const secondaryImg = document.createElement("img");
+      secondaryImg.src = person.src || "";
+      secondaryImg.alt = person.label;
+      secondaryImg.loading = "lazy";
+      secondary.appendChild(secondaryImg);
+      pair.appendChild(secondary);
+
+      const names = article.querySelector(".names");
+      if (names && !names.querySelector(".person-label")) {
+        const label = document.createElement("span");
+        label.className = "person-label";
+        label.textContent = person.label;
+        names.prepend(label);
+      }
+    });
+  }
+  buildCouplePhotoPairs();
 
   $("#mapsLink").href = C.event.mapsUrl;
   $("#calendarLink").href = buildGoogleCalendarUrl();
@@ -89,188 +122,66 @@
   }
   tick(); setInterval(tick, 1000);
 
-  function googleDate(iso) {
-    return new Date(iso).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z");
-  }
+  function googleDate(iso) { return new Date(iso).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z"); }
   function buildGoogleCalendarUrl() {
     const start = googleDate(C.event.startISO);
     const end = googleDate(C.event.endISO);
-    const params = new URLSearchParams({
-      action: "TEMPLATE",
-      text: C.event.title,
-      dates: `${start}/${end}`,
-      location: `${C.event.venue}, ${C.event.address}`,
-      details: C.event.calendarDescription
-    });
+    const params = new URLSearchParams({ action:"TEMPLATE", text:C.event.title, dates:`${start}/${end}`, location:`${C.event.venue}, ${C.event.address}`, details:C.event.calendarDescription });
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   }
 
   const STORAGE_KEY = "isti-adrian-rsvp-wishes-v1";
-  const form = $("#rsvpForm");
-  const status = $("#formStatus");
-  const submit = $("#submitButton");
-
-  function readLocal() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; }
-  }
-  function saveLocal(item) {
-    const all = readLocal(); all.unshift(item);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all.slice(0,50)));
-  }
-  function escapeHTML(str) {
-    return String(str).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[c]));
-  }
+  const form = $("#rsvpForm"), status = $("#formStatus"), submit = $("#submitButton");
+  function readLocal() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; } }
+  function saveLocal(item) { const all = readLocal(); all.unshift(item); localStorage.setItem(STORAGE_KEY, JSON.stringify(all.slice(0,50))); }
   function renderWishes(items) {
     const list = $("#wishesList");
-    if (!items.length) {
-      list.innerHTML = '<div class="empty-state">Be the first to leave a wish.</div>';
-      return;
-    }
-    list.innerHTML = items.filter(x => x.message).slice(0,30).map(x => `
-      <article class="wish">
-        <div class="wish__name">${escapeHTML(x.name || "A guest")}</div>
-        <p class="wish__message">“${escapeHTML(x.message)}”</p>
-        ${x.date ? `<div class="wish__meta">${escapeHTML(x.date)}</div>` : ""}
-      </article>
-    `).join("");
+    if (!items.length) { list.innerHTML = '<div class="empty-state">Be the first to leave a wish.</div>'; return; }
+    list.innerHTML = items.filter(x => x.message).slice(0,30).map(x => `<article class="wish"><div class="wish__name">${escapeHTML(x.name || "A guest")}</div><p class="wish__message">“${escapeHTML(x.message)}”</p>${x.date ? `<div class="wish__meta">${escapeHTML(x.date)}</div>` : ""}</article>`).join("");
   }
-
   function loadLocalWishes() { renderWishes(readLocal()); }
-
   function loadRemoteWishes() {
     if (!C.googleAppsScriptUrl) { loadLocalWishes(); return; }
     const cb = `weddingWishes_${Date.now()}`;
     const script = document.createElement("script");
     const cleanup = () => { try { delete window[cb]; } catch {} script.remove(); };
-    window[cb] = (data) => {
-      if (Array.isArray(data)) renderWishes(data.length ? data : readLocal());
-      else loadLocalWishes();
-      cleanup();
-    };
+    window[cb] = (data) => { if (Array.isArray(data)) renderWishes(data.length ? data : readLocal()); else loadLocalWishes(); cleanup(); };
     script.onerror = () => { loadLocalWishes(); cleanup(); };
     script.src = `${C.googleAppsScriptUrl.replace(/\/$/,"")}?action=wishes&callback=${cb}`;
-    document.body.appendChild(script);
-    setTimeout(cleanup, 10000);
+    document.body.appendChild(script); setTimeout(cleanup, 10000);
   }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const fd = new FormData(form);
-    const item = {
-      name: String(fd.get("name") || "").trim(),
-      attendance: String(fd.get("attendance") || ""),
-      guests: Number(fd.get("guests") || 1),
-      message: String(fd.get("message") || "").trim(),
-      date: new Date().toLocaleDateString("en-GB", {day:"2-digit",month:"short",year:"numeric"}),
-      timestamp: new Date().toISOString()
-    };
+    const item = { name:String(fd.get("name")||"").trim(), attendance:String(fd.get("attendance")||""), guests:Number(fd.get("guests")||1), message:String(fd.get("message")||"").trim(), date:new Date().toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}), timestamp:new Date().toISOString() };
     if (!item.name || !item.message) return;
-
-    submit.disabled = true; submit.textContent = "Sending…";
-    saveLocal(item);
-    renderWishes(readLocal());
-    status.textContent = "Thank you — your RSVP has been received.";
-
+    submit.disabled=true; submit.textContent="Sending…"; saveLocal(item); renderWishes(readLocal()); status.textContent="Thank you — your RSVP has been received.";
     if (C.googleAppsScriptUrl) {
-      try {
-        const body = new URLSearchParams(item);
-        await fetch(C.googleAppsScriptUrl, {
-          method:"POST", mode:"no-cors",
-          headers: {"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},
-          body
-        });
-        status.textContent = "Thank you — your RSVP has been recorded.";
-      } catch {
-        status.textContent = "Saved on this device. Please try again when you have a connection.";
-      }
-      setTimeout(loadRemoteWishes, 1200);
+      try { await fetch(C.googleAppsScriptUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:new URLSearchParams(item)}); status.textContent="Thank you — your RSVP has been recorded."; }
+      catch { status.textContent="Saved on this device. Please try again when you have a connection."; }
+      setTimeout(loadRemoteWishes,1200);
     }
-    form.reset();
-    submit.disabled = false; submit.textContent = "Send RSVP";
+    form.reset(); submit.disabled=false; submit.textContent="Send RSVP";
   });
 
-  document.querySelectorAll(".copy-button").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const target = document.getElementById(btn.dataset.copyTarget);
-      const value = target?.textContent?.trim() || "";
-      try {
-        await navigator.clipboard.writeText(value);
-        const old = btn.textContent; btn.textContent = "Copied ✓";
-        setTimeout(() => btn.textContent = old, 1400);
-      } catch { window.prompt("Copy this:", value); }
-    });
-  });
+  document.querySelectorAll(".copy-button").forEach(btn => btn.addEventListener("click", async () => {
+    const target = document.getElementById(btn.dataset.copyTarget), value = target?.textContent?.trim() || "";
+    try { await navigator.clipboard.writeText(value); const old=btn.textContent; btn.textContent="Copied ✓"; setTimeout(()=>btn.textContent=old,1400); }
+    catch { window.prompt("Copy this:",value); }
+  }));
 
-  const audio = $("#weddingMusic"), musicButton = $("#musicButton"), musicControl = $(".music-control");
-  audio.src = C.assets.music || "";
-  audio.preload = "auto";
-  audio.autoplay = true;
+  const audio=$("#weddingMusic"), musicButton=$("#musicButton"), musicControl=$(".music-control");
+  audio.src=C.assets.music||""; audio.preload="auto"; audio.autoplay=true;
+  async function startMusic(){ try{await audio.play();musicButton.setAttribute("aria-pressed","true");musicButton.setAttribute("aria-label","Pause wedding music");musicControl.classList.add("playing");return true;}catch{return false;} }
+  const openButton=$(".invitation-gate__open");
+  openButton.addEventListener("click",async()=>{document.body.classList.remove("is-locked");gate.classList.add("is-opening");await startMusic();setTimeout(()=>gate.remove(),1100);});
+  startMusic(); ["pointerdown","touchstart","keydown"].forEach(eventName=>window.addEventListener(eventName,()=>{if(audio.paused)startMusic();},{once:true,passive:true}));
+  musicButton.addEventListener("click",async()=>{try{if(audio.paused)await startMusic();else{audio.pause();musicButton.setAttribute("aria-pressed","false");musicButton.setAttribute("aria-label","Play wedding music");musicControl.classList.remove("playing");}}catch{status.textContent="Tap the music button again to start the song.";}});
 
-  async function startMusic() {
-    try {
-      await audio.play();
-      musicButton.setAttribute("aria-pressed","true");
-      musicButton.setAttribute("aria-label","Pause wedding music");
-      musicControl.classList.add("playing");
-      return true;
-    } catch { return false; }
-  }
-
-  const openButton = $(".invitation-gate__open");
-  openButton.addEventListener("click", async () => {
-    document.body.classList.remove("is-locked");
-    gate.classList.add("is-opening");
-    await startMusic();
-    setTimeout(() => gate.remove(), 1100);
-  });
-
-  startMusic();
-  ["pointerdown", "touchstart", "keydown"].forEach(eventName => {
-    window.addEventListener(eventName, () => { if (audio.paused) startMusic(); }, { once: true, passive: true });
-  });
-
-  musicButton.addEventListener("click", async () => {
-    try {
-      if (audio.paused) await startMusic();
-      else {
-        audio.pause();
-        musicButton.setAttribute("aria-pressed","false");
-        musicButton.setAttribute("aria-label","Play wedding music");
-        musicControl.classList.remove("playing");
-      }
-    } catch { status.textContent = "Tap the music button again to start the song."; }
-  });
-
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  }, {threshold:.12});
-
-  document.querySelectorAll("section > *").forEach((el, index) => {
-    if (!el.classList.contains("hero__image") && !el.classList.contains("hero__veil")) {
-      el.classList.add("reveal");
-      el.dataset.revealDelay = String((index % 4) + 1);
-      observer.observe(el);
-    }
-  });
-
-  if (!reduceMotion) {
-    const heroImage = $("#heroImage");
-    let raf = 0;
-    const parallax = () => {
-      raf = 0;
-      const y = Math.min(window.scrollY, window.innerHeight) * 0.055;
-      if (heroImage) heroImage.style.transform = `scale(1.06) translate3d(0, ${y}px, 0)`;
-    };
-    window.addEventListener("scroll", () => {
-      if (!raf) raf = requestAnimationFrame(parallax);
-    }, {passive:true});
-  }
-
+  const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("visible");observer.unobserve(entry.target);}});},{threshold:.12});
+  document.querySelectorAll("section > *").forEach((el,index)=>{if(!el.classList.contains("hero__image")&&!el.classList.contains("hero__veil")){el.classList.add("reveal");el.dataset.revealDelay=String((index%4)+1);observer.observe(el);}});
+  if(!reduceMotion){const heroImage=$("#heroImage");let raf=0;const parallax=()=>{raf=0;const y=Math.min(window.scrollY,window.innerHeight)*.055;if(heroImage)heroImage.style.transform=`scale(1.06) translate3d(0, ${y}px, 0)`;};window.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(parallax);},{passive:true});}
   loadRemoteWishes();
 })();
