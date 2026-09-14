@@ -6,13 +6,17 @@
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
   const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = src || ""; };
 
-  // Personalised invitation recipient from the URL path.
-  // Example: /wedding-invitation/Raka-Rizky -> "Dear, Raka Rizky"
+  // Personalised invitation recipient from either ?to=Raka%20Rizky or
+  // the clean path /wedding-invitation/Raka-Rizky.
   function getGuestName() {
+    const params = new URLSearchParams(window.location.search);
+    const queryName = params.get("to");
+    if (queryName) return queryName.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+
     const path = window.location.pathname.replace(/\/+$/, "");
     const parts = path.split("/").filter(Boolean);
     const slug = parts.length ? parts[parts.length - 1] : "";
-    if (!slug || /^(index\.html|wedding-invitation)$/i.test(slug)) return "";
+    if (!slug || /^(index\.html|404\.html|wedding-invitation)$/i.test(slug)) return "";
     try {
       return decodeURIComponent(slug).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
     } catch {
@@ -38,7 +42,6 @@
   document.body.prepend(gate);
   document.body.classList.add("is-locked");
 
-  // Content
   text("heroBride", C.couple.bride.split(" ")[0]);
   text("heroGroom", C.couple.groom.split(" ")[0]);
   text("heroDate", C.event.dateLabel);
@@ -60,17 +63,18 @@
 
   img("heroImage", C.assets.hero);
   img("bridePortrait", C.assets.bride);
+  img("brideSecond", C.assets.brideSecond);
   img("groomPortrait", C.assets.groom);
-  img("galleryWide", C.assets.engagementWide);
-  img("galleryBride", C.assets.bride);
-  img("galleryGroom", C.assets.groom);
+  img("groomSecond", C.assets.groomSecond);
+  img("galleryWide", C.assets.galleryOne);
+  img("galleryBride", C.assets.galleryTwo);
+  img("galleryGroom", C.assets.engagementWide);
   img("galleryClose", C.assets.engagementClose);
   img("closingImage", C.assets.couple);
 
   $("#mapsLink").href = C.event.mapsUrl;
   $("#calendarLink").href = buildGoogleCalendarUrl();
 
-  // Countdown
   const target = new Date(C.event.startISO).getTime();
   function tick() {
     const diff = Math.max(0, target - Date.now());
@@ -101,7 +105,6 @@
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
   }
 
-  // RSVP + wishes
   const STORAGE_KEY = "isti-adrian-rsvp-wishes-v1";
   const form = $("#rsvpForm");
   const status = $("#formStatus");
@@ -140,9 +143,8 @@
     const script = document.createElement("script");
     const cleanup = () => { try { delete window[cb]; } catch {} script.remove(); };
     window[cb] = (data) => {
-      if (Array.isArray(data)) {
-        renderWishes(data.length ? data : readLocal());
-      } else loadLocalWishes();
+      if (Array.isArray(data)) renderWishes(data.length ? data : readLocal());
+      else loadLocalWishes();
       cleanup();
     };
     script.onerror = () => { loadLocalWishes(); cleanup(); };
@@ -199,7 +201,6 @@
     });
   });
 
-  // Music: opening the invitation is a real user gesture, so it can start reliably.
   const audio = $("#weddingMusic"), musicButton = $("#musicButton"), musicControl = $(".music-control");
   audio.src = C.assets.music || "";
   audio.preload = "auto";
@@ -212,9 +213,7 @@
       musicButton.setAttribute("aria-label","Pause wedding music");
       musicControl.classList.add("playing");
       return true;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }
 
   const openButton = $(".invitation-gate__open");
@@ -227,9 +226,7 @@
 
   startMusic();
   ["pointerdown", "touchstart", "keydown"].forEach(eventName => {
-    window.addEventListener(eventName, () => {
-      if (audio.paused) startMusic();
-    }, { once: true, passive: true });
+    window.addEventListener(eventName, () => { if (audio.paused) startMusic(); }, { once: true, passive: true });
   });
 
   musicButton.addEventListener("click", async () => {
@@ -244,7 +241,6 @@
     } catch { status.textContent = "Tap the music button again to start the song."; }
   });
 
-  // Scroll reveal + gentle hero parallax.
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
