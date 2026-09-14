@@ -6,6 +6,21 @@
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
   const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = src || ""; };
 
+  // Premium invitation entrance — also gives the browser a user gesture for music.
+  const gate = document.createElement("div");
+  gate.className = "invitation-gate";
+  gate.innerHTML = `
+    <div class="invitation-gate__inner">
+      <div class="invitation-gate__monogram">I & A</div>
+      <div class="invitation-gate__rule"></div>
+      <p>THE WEDDING OF</p>
+      <h2>Isti & Adrian</h2>
+      <p>Minggu, 15 November 2026</p>
+      <button class="invitation-gate__open" type="button">Buka Undangan</button>
+    </div>`;
+  document.body.prepend(gate);
+  document.body.classList.add("is-locked");
+
   // Content
   text("heroBride", C.couple.bride.split(" ")[0]);
   text("heroGroom", C.couple.groom.split(" ")[0]);
@@ -108,11 +123,9 @@
     const cleanup = () => { try { delete window[cb]; } catch {} script.remove(); };
     window[cb] = (data) => {
       if (Array.isArray(data)) {
-        const local = readLocal();
-        renderWishes([...local, ...data].filter((v,i,a) =>
-          i === a.findIndex(t => (t.timestamp || t.date || "") + (t.name || "") + (t.message || "") ===
-            (v.timestamp || v.date || "") + (v.name || "") + (v.message || ""))
-        ));
+        // Remote data is the shared source of truth. Local storage is used only
+        // as a fallback while the database is empty/unavailable.
+        renderWishes(data.length ? data : readLocal());
       } else loadLocalWishes();
       cleanup();
     };
@@ -170,8 +183,7 @@
     });
   });
 
-  // Music: attempt autoplay immediately. Modern browsers may block unmuted
-  // autoplay; in that case the first tap/click/keypress starts it automatically.
+  // Music: opening the invitation is a real user gesture, so it can start reliably.
   const audio = $("#weddingMusic"), musicButton = $("#musicButton"), musicControl = $(".music-control");
   audio.src = C.assets.music || "";
   audio.preload = "auto";
@@ -188,6 +200,14 @@
       return false;
     }
   }
+
+  const openButton = $(".invitation-gate__open");
+  openButton.addEventListener("click", async () => {
+    document.body.classList.remove("is-locked");
+    gate.classList.add("is-opening");
+    await startMusic();
+    setTimeout(() => gate.remove(), 1100);
+  });
 
   startMusic();
   ["pointerdown", "touchstart", "keydown"].forEach(eventName => {
@@ -208,12 +228,37 @@
     } catch { status.textContent = "Tap the music button again to start the song."; }
   });
 
+  // Scroll reveal + gentle hero parallax.
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); } });
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
   }, {threshold:.12});
-  document.querySelectorAll("section > *").forEach(el => {
-    if (!el.classList.contains("hero__image") && !el.classList.contains("hero__veil")) { el.classList.add("reveal"); observer.observe(el); }
+
+  document.querySelectorAll("section > *").forEach((el, index) => {
+    if (!el.classList.contains("hero__image") && !el.classList.contains("hero__veil")) {
+      el.classList.add("reveal");
+      el.dataset.revealDelay = String((index % 4) + 1);
+      observer.observe(el);
+    }
   });
+
+  if (!reduceMotion) {
+    const heroImage = $("#heroImage");
+    let raf = 0;
+    const parallax = () => {
+      raf = 0;
+      const y = Math.min(window.scrollY, window.innerHeight) * 0.055;
+      if (heroImage) heroImage.style.transform = `scale(1.06) translate3d(0, ${y}px, 0)`;
+    };
+    window.addEventListener("scroll", () => {
+      if (!raf) raf = requestAnimationFrame(parallax);
+    }, {passive:true});
+  }
 
   loadRemoteWishes();
 })();
