@@ -10,7 +10,6 @@ window.WEDDING_CONFIG = {
 
   event: {
     dateLabel: "Minggu, 15 November 2026",
-    // Change these two values when the exact ceremony/reception time is final.
     timeLabel: "10.00 WIB",
     startISO: "2026-11-15T10:00:00+07:00",
     endISO: "2026-11-15T14:00:00+07:00",
@@ -27,9 +26,6 @@ window.WEDDING_CONFIG = {
     address: "Park Serpong, XYZ Cove 10 No 85, Curug Wetan, Curug, Kabupaten Tangerang"
   },
 
-  // Paste your deployed Google Apps Script Web App URL here.
-  // Leave blank while developing; RSVP will still work locally and be stored
-  // in the browser as a fallback.
   googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbzHZh18e260U5msBrnQi1uP8P9ACUBMJ6Uya9bO5nYVtpmENzWdg3SGnNT3m_b-HLJf/exec",
 
   assets: {
@@ -37,6 +33,10 @@ window.WEDDING_CONFIG = {
     couple: "assets/images/couple-portrait.jpg",
     bride: "assets/images/bride-portrait.jpg",
     groom: "assets/images/groom-portrait.jpg",
+    brideSecond: "assets/images/1.jpeg",
+    groomSecond: "assets/images/2.jpeg",
+    galleryOne: "assets/images/3.jpeg",
+    galleryTwo: "assets/images/4.jpeg",
     engagementWide: "assets/images/engagement-wide.jpg",
     engagementClose: "assets/images/engagement-close.jpg",
     music: "assets/audio/wedding-song.mp3"
