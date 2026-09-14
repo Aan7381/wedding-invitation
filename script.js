@@ -6,6 +6,22 @@
   const text = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
   const img = (id, src) => { const el = document.getElementById(id); if (el) el.src = src || ""; };
 
+  // Personalised invitation recipient from the URL path.
+  // Example: /wedding-invitation/Raka-Rizky -> "Dear, Raka Rizky"
+  function getGuestName() {
+    const path = window.location.pathname.replace(/\/+$/, "");
+    const parts = path.split("/").filter(Boolean);
+    const slug = parts.length ? parts[parts.length - 1] : "";
+    if (!slug || /^(index\.html|wedding-invitation)$/i.test(slug)) return "";
+    try {
+      return decodeURIComponent(slug).replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+    } catch {
+      return slug.replace(/[-_]+/g, " ").trim();
+    }
+  }
+
+  const guestName = getGuestName();
+
   // Premium invitation entrance — also gives the browser a user gesture for music.
   const gate = document.createElement("div");
   gate.className = "invitation-gate";
@@ -15,6 +31,7 @@
       <div class="invitation-gate__rule"></div>
       <p>THE WEDDING OF</p>
       <h2>Isti & Adrian</h2>
+      ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
       <p>Minggu, 15 November 2026</p>
       <button class="invitation-gate__open" type="button">Buka Undangan</button>
     </div>`;
@@ -42,7 +59,8 @@
   text("giftAddress", C.gift.address);
 
   img("heroImage", C.assets.hero);
-  img("coupleImage", C.assets.couple);
+  img("bridePortrait", C.assets.bride);
+  img("groomPortrait", C.assets.groom);
   img("galleryWide", C.assets.engagementWide);
   img("galleryBride", C.assets.bride);
   img("galleryGroom", C.assets.groom);
@@ -123,8 +141,6 @@
     const cleanup = () => { try { delete window[cb]; } catch {} script.remove(); };
     window[cb] = (data) => {
       if (Array.isArray(data)) {
-        // Remote data is the shared source of truth. Local storage is used only
-        // as a fallback while the database is empty/unavailable.
         renderWishes(data.length ? data : readLocal());
       } else loadLocalWishes();
       cleanup();
