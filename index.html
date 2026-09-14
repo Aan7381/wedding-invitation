@@ -45,18 +45,27 @@
         <h2>Isti <em>&</em> Adrian</h2>
       </div>
       <div class="couple-card">
-        <div class="couple-photo-wrap">
-          <img id="coupleImage" src="" alt="Isti & Adrian" loading="lazy">
-        </div>
-        <div class="names">
-          <h3 id="brideName"></h3>
-          <p>Putri dari</p>
-          <strong id="brideParents"></strong>
-          <span class="amp">&</span>
-          <h3 id="groomName"></h3>
-          <p>Putra dari</p>
-          <strong id="groomParents"></strong>
-        </div>
+        <article class="couple-person couple-person--bride">
+          <div class="couple-photo-wrap">
+            <img id="bridePortrait" src="" alt="Isti" loading="lazy">
+          </div>
+          <div class="names">
+            <h3 id="brideName"></h3>
+            <p>Putri dari</p>
+            <strong id="brideParents"></strong>
+          </div>
+        </article>
+        <div class="couple-amp" aria-hidden="true">&</div>
+        <article class="couple-person couple-person--groom">
+          <div class="couple-photo-wrap">
+            <img id="groomPortrait" src="" alt="Adrian" loading="lazy">
+          </div>
+          <div class="names">
+            <h3 id="groomName"></h3>
+            <p>Putra dari</p>
+            <strong id="groomParents"></strong>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -79,6 +88,16 @@
       <div class="event-date">
         <span id="eventDate"></span>
         <span id="eventTime"></span>
+      </div>
+      <div class="event-schedule" aria-label="Wedding schedule">
+        <article class="schedule-item">
+          <span class="schedule-item__time">07.00 — 09.00 WIB</span>
+          <h3>Akad</h3>
+        </article>
+        <article class="schedule-item">
+          <span class="schedule-item__time">10.00 — 14.00 WIB</span>
+          <h3>Resepsi</h3>
+        </article>
       </div>
       <div class="event-card">
         <span class="event-card__label">VENUE</span>
