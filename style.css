@@ -120,21 +120,25 @@ body.home-entering .hero::after{
   position:absolute;
   inset:16% 23%;
   overflow:hidden;
-  clip-path:ellipse(50% 50% at 50% 50%);
-  -webkit-clip-path:ellipse(50% 50% at 50% 50%);
+  border-radius:50%;
+  -webkit-mask-image:-webkit-radial-gradient(white, black);
+  mask-image:radial-gradient(circle, #000 99%, transparent 100%);
   background:#151712;
   z-index:1;
+  contain:paint;
 }
 .couple-photo-frame__image img{
   width:100%;
   height:100%;
   object-fit:cover;
-  transform:scale(1.045);
-  transition:transform 1.2s cubic-bezier(.2,.7,.2,1);
+  transform:none;
+  transition:none;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
 }
 .couple-photo-frame__image--bride img{object-position:50% 30%}
 .couple-photo-frame__image--groom img{object-position:50% 28%}
-.couple-person:hover .couple-photo-frame__image img{transform:scale(1.085)}
+.couple-person:hover .couple-photo-frame__image img{transform:none}
 .couple-photo-frame__ornament{
   position:absolute;
   inset:0;
