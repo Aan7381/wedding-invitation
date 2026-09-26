@@ -136,8 +136,16 @@ body.home-entering .hero::after{
   backface-visibility:hidden;
   -webkit-backface-visibility:hidden;
 }
-.couple-photo-frame__image--bride img{object-position:50% 30%}
-.couple-photo-frame__image--groom img{object-position:50% 28%}
+.couple-photo-frame__image--bride img {
+    transform: scale(1.7);
+    object-position: 50% -50%    
+}
+
+.couple-photo-frame__image--groom img {
+    transform: scale(1.8);
+    padding-left: 10px;
+    object-position: 30% -80%
+}
 .couple-person:hover .couple-photo-frame__image img{transform:none}
 .couple-photo-frame__ornament{
   position:absolute;
