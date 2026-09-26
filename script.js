@@ -45,7 +45,6 @@
       <div class="invitation-gate__rule"></div>
       <p>THE WEDDING OF</p>
       <h2>Isti & Adrian</h2>
-      <p>Minggu, 15 November 2026</p>
       ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
       <button class="invitation-gate__open" type="button">Buka Undangan</button>
     </div>`;
@@ -82,8 +81,8 @@
 
   function buildCouplePhotoPairs() {
     const people = [
-      { selector: ".couple-person--bride", src: C.assets.brideSecond, label: "THE BRIDE" },
-      { selector: ".couple-person--groom", src: C.assets.groomSecond, label: "THE GROOM" }
+      { selector: ".couple-person--bride", src: C.assets.brideSecond, label: "" },
+      { selector: ".couple-person--groom", src: C.assets.groomSecond, label: "" }
     ];
     people.forEach(person => {
       const article = document.querySelector(person.selector);
