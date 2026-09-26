@@ -10,6 +10,7 @@ window.WEDDING_CONFIG = {
 
   event: {
     dateLabel: "Minggu, 15 November 2026",
+    shortDateLabel: "15. 11. 2026",
     timeLabel: "10.00 WIB",
     startISO: "2026-11-15T10:00:00+07:00",
     endISO: "2026-11-15T14:00:00+07:00",
@@ -30,6 +31,7 @@ window.WEDDING_CONFIG = {
 
   assets: {
     hero: "assets/images/hero.jpg",
+    frame: "assets/images/Frame.png",
     couple: "assets/images/couple-portrait.jpg",
     bride: "assets/images/bride-portrait.jpg",
     groom: "assets/images/groom-portrait.jpg",

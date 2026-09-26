@@ -23,15 +23,8 @@
   // the existing index.html and on personalised GitHub Pages 404 routes.
   const premiumStyle = document.createElement("style");
   premiumStyle.textContent = `
-    @media(min-width:700px){
-      .couple-card{grid-template-columns:1fr 1fr;gap:70px;align-items:start}
-      .couple-amp{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);z-index:5;margin:0;background:var(--ink);padding:12px 14px}
-      .couple-person--bride,.couple-person--groom{padding:0}
-    }
     @media(max-width:699px){
       .invitation-gate__guest{max-width:86vw;margin-left:auto;margin-right:auto;line-height:1.1}
-      .couple-photo-pair{will-change:transform}
-      .couple-photo-wrap--secondary{box-shadow:0 16px 36px rgba(0,0,0,.32)}
       .schedule-item strong{white-space:nowrap}
     }
   `;
@@ -53,7 +46,7 @@
 
   text("heroBride", C.couple.bride.split(" ")[0]);
   text("heroGroom", C.couple.groom.split(" ")[0]);
-  text("heroDate", C.event.dateLabel);
+  text("heroDate", C.event.shortDateLabel || "15. 11. 2026");
   text("eventDate", C.event.dateLabel);
   text("eventTime", C.event.timeLabel);
   text("venueName", C.event.venue);
@@ -79,38 +72,6 @@
   img("galleryClose", C.assets.engagementClose);
   img("closingImage", C.assets.couple);
 
-  function buildCouplePhotoPairs() {
-    const people = [
-      { selector: ".couple-person--bride", src: C.assets.brideSecond, label: "" },
-      { selector: ".couple-person--groom", src: C.assets.groomSecond, label: "" }
-    ];
-    people.forEach(person => {
-      const article = document.querySelector(person.selector);
-      const original = article?.querySelector(".couple-photo-wrap");
-      if (!article || !original || article.querySelector(".couple-photo-pair")) return;
-      original.classList.add("couple-photo-wrap--main");
-      const pair = document.createElement("div");
-      pair.className = "couple-photo-pair";
-      original.parentNode.insertBefore(pair, original);
-      pair.appendChild(original);
-      const secondary = document.createElement("div");
-      secondary.className = "couple-photo-wrap couple-photo-wrap--secondary";
-      const secondaryImg = document.createElement("img");
-      secondaryImg.src = person.src || "";
-      secondaryImg.alt = person.label;
-      secondaryImg.loading = "lazy";
-      secondary.appendChild(secondaryImg);
-      pair.appendChild(secondary);
-      const names = article.querySelector(".names");
-      if (names && !names.querySelector(".person-label")) {
-        const label = document.createElement("span");
-        label.className = "person-label";
-        label.textContent = person.label;
-        names.prepend(label);
-      }
-    });
-  }
-  buildCouplePhotoPairs();
 
   $("#mapsLink").href = C.event.mapsUrl;
   $("#calendarLink").href = buildGoogleCalendarUrl();
@@ -132,7 +93,15 @@
 
   const audio=$("#weddingMusic"),musicButton=$("#musicButton"),musicControl=$(".music-control");audio.src=C.assets.music||"";audio.preload="auto";audio.autoplay=true;
   async function startMusic(){try{await audio.play();musicButton.setAttribute("aria-pressed","true");musicButton.setAttribute("aria-label","Pause wedding music");musicControl.classList.add("playing");return true;}catch{return false;}}
-  const openButton=$(".invitation-gate__open");openButton.addEventListener("click",async()=>{document.body.classList.remove("is-locked");gate.classList.add("is-opening");await startMusic();setTimeout(()=>gate.remove(),1100);});
+  const openButton=$(".invitation-gate__open");
+  openButton.addEventListener("click",async()=>{
+    document.body.classList.add("home-entering");
+    document.body.classList.remove("is-locked");
+    gate.classList.add("is-opening");
+    await startMusic();
+    setTimeout(()=>gate.remove(),1200);
+    setTimeout(()=>document.body.classList.add("home-entered"),3800);
+  });
   startMusic();["pointerdown","touchstart","keydown"].forEach(eventName=>window.addEventListener(eventName,()=>{if(audio.paused)startMusic();},{once:true,passive:true}));
   musicButton.addEventListener("click",async()=>{try{if(audio.paused)await startMusic();else{audio.pause();musicButton.setAttribute("aria-pressed","false");musicButton.setAttribute("aria-label","Play wedding music");musicControl.classList.remove("playing");}}catch{status.textContent="Tap the music button again to start the song.";}});
 
