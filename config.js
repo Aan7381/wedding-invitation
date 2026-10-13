@@ -3,7 +3,7 @@ window.WEDDING_CONFIG = {
     bride: "Istiadzah Hazar Fathonah",
     groom: "Adrian Muhammad Farhan",
     brideFather: "Adi Kuswanto",
-    brideMother: "Iin Suhartini",
+    brideMother: "Iin",
     groomFather: "Jumadi",
     groomMother: "Catharina"
   },
@@ -15,8 +15,8 @@ window.WEDDING_CONFIG = {
     startISO: "2026-11-15T10:00:00+07:00",
     endISO: "2026-11-15T14:00:00+07:00",
     title: "The Wedding of Isti & Adrian",
-    venue: "Kediaman Mempelai Wanita",
-    address: "Bugel Mas Indah, Jalan Pasundan Blok D2 No 21 RT:06/RW:05 Kel. Bugel, Kec. Karawaci, Kota Tangerang",
+    venue: "The Bride's Family Home",
+    address: "Bugel Mas Indah, Jl Pasundan Blok D2 No 21 RT:06/RW:05 Kel. Bugel, Kec. Karawaci, Kota Tangerang",
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bugel+Mas+Indah+Jalan+Pasundan+Blok+D2+No+21+RT%3A06%2FRW%3A05+Kel.+Bugel+Kec.+Karawaci+Kota+Tangerang",
     calendarDescription: "We would be honored to celebrate this special day with you.\n\nThe Wedding of Isti & Adrian"
   },
@@ -24,7 +24,7 @@ window.WEDDING_CONFIG = {
   gift: {
     account1: { bank: "Blu by BCA Digital", number: "006861884359", name: "Istiadzah Hazar" },
     account2: { bank: "BCA", number: "1940439864", name: "Adrian Muhammad Farhan" },
-    address: "Park Serpong, XYZ Cove 10 No 85, Curug Wetan, Curug, Kabupaten Tangerang"
+    address: "Park Serpong, XYZ Cove 10 No 85, Curug Wetan, Curug, Kabupaten Tangerang, Banten, 15820"
   },
 
   googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbzHZh18e260U5msBrnQi1uP8P9ACUBMJ6Uya9bO5nYVtpmENzWdg3SGnNT3m_b-HLJf/exec",
