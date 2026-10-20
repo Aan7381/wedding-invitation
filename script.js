@@ -43,8 +43,8 @@
       <div class="gate-window">
         <div class="gate-window__photo"></div>
         <div class="gate-window__ground"></div>
-        <svg class="kayon kayon--l" viewBox="0 0 100 345" preserveAspectRatio="xMaxYMid meet"><use href="#kayon-half"/></svg>
-        <svg class="kayon kayon--r" viewBox="0 0 100 345" preserveAspectRatio="xMinYMid meet"><use href="#kayon-half" transform="translate(100 0) scale(-1 1)"/></svg>
+        <svg class="kayon kayon--l" viewBox="0 0 100 345" preserveAspectRatio="xMaxYMid meet"><use href="#kayon-l"/></svg>
+        <svg class="kayon kayon--r" viewBox="0 0 100 345" preserveAspectRatio="xMinYMid meet"><use href="#kayon-r" transform="translate(100 0) scale(-1 1)"/></svg>
       </div>
       <svg class="gate-frame" viewBox="0 -14 200 354"><use href="#arch-frame"/></svg>
     </div>
