@@ -15,109 +15,77 @@
 
   if (!images.length) return;
 
+  // A native scroll-snap story: one photo per screen, swipe or arrows, thin progress line.
+  // No timers, no cloned slides, no JS-driven transforms — the browser does the scrolling.
   gallery.className = "gallery-slider";
   gallery.setAttribute("aria-label", "Wedding photo gallery");
   gallery.innerHTML = `
-    <div class="gallery-slider__viewport">
+    <div class="gallery-slider__viewport" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Photos">
       <div class="gallery-slider__track"></div>
     </div>
     <div class="gallery-slider__controls">
       <button type="button" class="gallery-slider__arrow gallery-slider__arrow--prev" aria-label="Previous photo">←</button>
       <div class="gallery-slider__count" aria-live="polite"><span class="gallery-slider__current">01</span><span>/</span><span>${String(images.length).padStart(2, "0")}</span></div>
       <button type="button" class="gallery-slider__arrow gallery-slider__arrow--next" aria-label="Next photo">→</button>
-    </div>`;
+    </div>
+    <div class="gallery-slider__progress" aria-hidden="true"><i></i></div>`;
 
   const viewport = gallery.querySelector(".gallery-slider__viewport");
   const track = gallery.querySelector(".gallery-slider__track");
   const currentEl = gallery.querySelector(".gallery-slider__current");
+  const bar = gallery.querySelector(".gallery-slider__progress i");
 
-  const makeSlide = (item, clone = false) => {
+  images.forEach((item, i) => {
     const figure = document.createElement("figure");
     figure.className = "gallery-slide";
-    if (clone) figure.setAttribute("aria-hidden", "true");
     const img = document.createElement("img");
     img.src = item.src;
     img.alt = item.alt;
-    img.loading = "lazy";
+    img.decoding = "async";
+    img.loading = i === 0 ? "eager" : "lazy"; // only the first photo costs bandwidth up front
     figure.appendChild(img);
-    return figure;
-  };
+    track.appendChild(figure);
+  });
 
-  // Clones create a seamless loop in both directions without a visible reset.
-  track.appendChild(makeSlide(images[images.length - 1], true));
-  images.forEach(item => track.appendChild(makeSlide(item)));
-  track.appendChild(makeSlide(images[0], true));
+  const slides = Array.from(track.children);
+  const step = () => (slides[1] ? slides[1].offsetLeft - slides[0].offsetLeft : viewport.clientWidth);
+  const indexNow = () => Math.min(slides.length - 1, Math.max(0, Math.round(viewport.scrollLeft / step())));
 
-  let index = 1;
-  let timer = null;
-  let isAnimating = false;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  function setPosition(animate = true) {
-    track.style.transition = animate && !reduceMotion ? "transform 850ms cubic-bezier(.22,.72,.18,1)" : "none";
-    track.style.transform = `translate3d(${-index * 100}%, 0, 0)`;
-    currentEl.textContent = String(((index - 1 + images.length) % images.length) + 1).padStart(2, "0");
+  let raf = 0;
+  function paint() {
+    raf = 0;
+    const max = viewport.scrollWidth - viewport.clientWidth;
+    bar.style.transform = `scaleX(${max > 0 ? viewport.scrollLeft / max : 0})`;
+    currentEl.textContent = String(indexNow() + 1).padStart(2, "0");
   }
+  viewport.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(paint); }, { passive: true });
 
-  function go(nextIndex) {
-    if (isAnimating) return;
-    isAnimating = true;
-    index = nextIndex;
-    setPosition(true);
-    window.setTimeout(() => {
-      if (index === 0) {
-        index = images.length;
-        setPosition(false);
-      } else if (index === images.length + 1) {
-        index = 1;
-        setPosition(false);
-      }
-      isAnimating = false;
-    }, reduceMotion ? 20 : 880);
-  }
+  const goTo = n => {
+    const i = Math.min(slides.length - 1, Math.max(0, n));
+    viewport.scrollTo({ left: i * step(), behavior: reduceMotion ? "auto" : "smooth" });
+  };
+  gallery.querySelector(".gallery-slider__arrow--next").addEventListener("click", () => goTo(indexNow() + 1));
+  gallery.querySelector(".gallery-slider__arrow--prev").addEventListener("click", () => goTo(indexNow() - 1));
+  viewport.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight") { e.preventDefault(); goTo(indexNow() + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); goTo(indexNow() - 1); }
+  });
 
-  function next() { go(index + 1); }
-  function prev() { go(index - 1); }
+  // Desktop mouse drag (touch uses native scrolling).
+  let down = false, startX = 0, startLeft = 0;
+  viewport.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse") return;
+    down = true; startX = e.clientX; startLeft = viewport.scrollLeft;
+    viewport.classList.add("is-dragging");
+  });
+  window.addEventListener("pointermove", e => { if (down) viewport.scrollLeft = startLeft - (e.clientX - startX); });
+  window.addEventListener("pointerup", () => {
+    if (!down) return;
+    down = false;
+    viewport.classList.remove("is-dragging");
+    goTo(indexNow());
+  });
 
-  gallery.querySelector(".gallery-slider__arrow--next").addEventListener("click", next);
-  gallery.querySelector(".gallery-slider__arrow--prev").addEventListener("click", prev);
-
-  let startX = 0;
-  let startY = 0;
-  let dragging = false;
-  viewport.addEventListener("touchstart", event => {
-    const touch = event.changedTouches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-    dragging = true;
-    stopAuto();
-  }, { passive: true });
-  viewport.addEventListener("touchend", event => {
-    if (!dragging) return;
-    dragging = false;
-    const touch = event.changedTouches[0];
-    const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
-    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) next(); else prev();
-    }
-    startAuto();
-  }, { passive: true });
-
-  gallery.addEventListener("mouseenter", stopAuto);
-  gallery.addEventListener("mouseleave", startAuto);
-  gallery.addEventListener("focusin", stopAuto);
-  gallery.addEventListener("focusout", startAuto);
-
-  function startAuto() {
-    if (reduceMotion || timer) return;
-    timer = window.setInterval(next, 4200);
-  }
-  function stopAuto() {
-    if (timer) window.clearInterval(timer);
-    timer = null;
-  }
-
-  setPosition(false);
-  startAuto();
+  paint();
 })();

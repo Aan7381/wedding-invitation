@@ -66,10 +66,6 @@
   img("heroImage", C.assets.hero);
   img("bridePortrait", C.assets.bride);
   img("groomPortrait", C.assets.groom);
-  img("galleryWide", C.assets.galleryOne);
-  img("galleryBride", C.assets.galleryTwo);
-  img("galleryGroom", C.assets.engagementWide);
-  img("galleryClose", C.assets.engagementClose);
   img("closingImage", C.assets.couple);
 
 
@@ -107,7 +103,31 @@
 
   const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("visible");observer.unobserve(entry.target);}});},{threshold:.12});
-  document.querySelectorAll("section > *").forEach((el,index)=>{if(!el.classList.contains("hero__image")&&!el.classList.contains("hero__veil")){el.classList.add("reveal");el.dataset.revealDelay=String((index%4)+1);observer.observe(el);}});
-  if(!reduceMotion){const heroImage=$("#heroImage");let raf=0;const parallax=()=>{raf=0;const y=Math.min(window.scrollY,window.innerHeight)*.055;if(heroImage)heroImage.style.transform=`scale(1.06) translate3d(0, ${y}px, 0)`;};window.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(parallax);},{passive:true});}
+  const STAGGER=".couple-card,.countdown-grid,.event-schedule,.gift-list,.wishes-list";
+  document.querySelectorAll("section > *").forEach((el,index)=>{
+    if(el.classList.contains("hero__image")||el.classList.contains("hero__veil"))return;
+    if(el.matches(STAGGER)){ // names, times and digits arrive one by one
+      Array.from(el.children).forEach((child,i)=>{child.classList.add("reveal");child.style.transitionDelay=`${i*110}ms`;observer.observe(child);});
+      return;
+    }
+    el.classList.add("reveal");el.dataset.revealDelay=String((index%4)+1);observer.observe(el);
+  });
+  if(!reduceMotion){
+    const heroImage=$("#heroImage");
+    const live=new Set();
+    const seen=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?live.add(e.target):live.delete(e.target)),{rootMargin:"20% 0px"});
+    document.querySelectorAll("section").forEach(sec=>seen.observe(sec));
+    let raf=0;
+    const depth=()=>{
+      raf=0;const vh=window.innerHeight;
+      const y=Math.min(window.scrollY,vh)*.055;
+      if(heroImage)heroImage.style.transform=`scale(1.06) translate3d(0, ${y}px, 0)`;
+      live.forEach(sec=>{const r=sec.getBoundingClientRect();const p=(r.top+r.height/2-vh/2)/vh; // -1..1 around screen centre
+        sec.style.setProperty("--drift",`${(p*-40).toFixed(1)}px`);   // gold rings drift against the scroll
+        sec.style.setProperty("--float",`${(p*-14).toFixed(1)}px`);}); // framed portraits / closing photo ease past
+    };
+    window.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(depth);},{passive:true});
+    depth();
+  }
   loadRemoteWishes();
 })();

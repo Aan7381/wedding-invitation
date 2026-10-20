@@ -31,7 +31,7 @@ window.WEDDING_CONFIG = {
 
   assets: {
     hero: "assets/images/hero.jpg",
-    frame: "assets/images/—Pngtree—ornate gold oval mirror frame_20806647.png",
+    frame: "assets/images/gold-oval-frame.webp",
     couple: "assets/images/couple-portrait.jpg",
     bride: "assets/images/bride-portrait.jpg",
     groom: "assets/images/groom-portrait.jpg",
