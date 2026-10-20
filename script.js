@@ -32,14 +32,26 @@
 
   const gate = document.createElement("div");
   gate.className = "invitation-gate";
+  gate.setAttribute("role", "dialog");
+  gate.setAttribute("aria-label", "Wedding invitation cover");
+  // Two batik doors + a gunungan (wayang mountain) arch holding the cover text and a gold wax seal.
   gate.innerHTML = `
+    <div class="gate-door gate-door--l" aria-hidden="true"></div>
+    <div class="gate-door gate-door--r" aria-hidden="true"></div>
     <div class="invitation-gate__inner">
+      <svg class="gate-arch" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M100 4C107 38 150 58 171 110C191 160 187 232 181 296H19C13 232 9 160 29 110C50 58 93 38 100 4Z" vector-effect="non-scaling-stroke"/>
+        <path class="gate-arch__inner" d="M100 22C106 50 140 68 158 114C174 158 171 226 166 284H34C29 226 26 158 42 114C60 68 94 50 100 22Z" vector-effect="non-scaling-stroke"/>
+      </svg>
       <div class="invitation-gate__monogram">I & A</div>
       <div class="invitation-gate__rule"></div>
       <p>THE WEDDING OF</p>
       <h2>Isti & Adrian</h2>
       ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
-      <button class="invitation-gate__open" type="button">Buka Undangan</button>
+      <button class="invitation-gate__open" type="button">
+        <span class="gate-seal" aria-hidden="true">I&A</span>
+        <span class="gate-cap">Buka Undangan</span>
+      </button>
     </div>`;
   document.body.prepend(gate);
   document.body.classList.add("is-locked");
@@ -66,10 +78,6 @@
   img("heroImage", C.assets.hero);
   img("bridePortrait", C.assets.bride);
   img("groomPortrait", C.assets.groom);
-  img("galleryWide", C.assets.galleryOne);
-  img("galleryBride", C.assets.galleryTwo);
-  img("galleryGroom", C.assets.engagementWide);
-  img("galleryClose", C.assets.engagementClose);
   img("closingImage", C.assets.couple);
 
 
@@ -95,19 +103,45 @@
   async function startMusic(){try{await audio.play();musicButton.setAttribute("aria-pressed","true");musicButton.setAttribute("aria-label","Pause wedding music");musicControl.classList.add("playing");return true;}catch{return false;}}
   const openButton=$(".invitation-gate__open");
   openButton.addEventListener("click",async()=>{
-    document.body.classList.add("home-entering");
+    openButton.disabled=true;
+    gate.classList.add("is-opening");            // seal pops, text fades, doors swing (CSS)
     document.body.classList.remove("is-locked");
-    gate.classList.add("is-opening");
+    setTimeout(()=>document.body.classList.add("home-entering"),450); // hero reveal starts as the doors part
     await startMusic();
-    setTimeout(()=>gate.remove(),1200);
-    setTimeout(()=>document.body.classList.add("home-entered"),3800);
+    setTimeout(()=>gate.remove(),2400);
+    setTimeout(()=>document.body.classList.add("home-entered"),4300);
   });
   startMusic();["pointerdown","touchstart","keydown"].forEach(eventName=>window.addEventListener(eventName,()=>{if(audio.paused)startMusic();},{once:true,passive:true}));
   musicButton.addEventListener("click",async()=>{try{if(audio.paused)await startMusic();else{audio.pause();musicButton.setAttribute("aria-pressed","false");musicButton.setAttribute("aria-label","Play wedding music");musicControl.classList.remove("playing");}}catch{status.textContent="Tap the music button again to start the song.";}});
 
   const reduceMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add("visible");observer.unobserve(entry.target);}});},{threshold:.12});
-  document.querySelectorAll("section > *").forEach((el,index)=>{if(!el.classList.contains("hero__image")&&!el.classList.contains("hero__veil")){el.classList.add("reveal");el.dataset.revealDelay=String((index%4)+1);observer.observe(el);}});
-  if(!reduceMotion){const heroImage=$("#heroImage");let raf=0;const parallax=()=>{raf=0;const y=Math.min(window.scrollY,window.innerHeight)*.055;if(heroImage)heroImage.style.transform=`scale(1.06) translate3d(0, ${y}px, 0)`;};window.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(parallax);},{passive:true});}
+  const STAGGER=".couple-card,.countdown-grid,.event-schedule,.gift-list,.wishes-list";
+  document.querySelectorAll("section > *").forEach((el,index)=>{
+    if(el.classList.contains("hero__image")||el.classList.contains("hero__veil"))return;
+    if(el.matches(STAGGER)){ // names, times and digits arrive one by one
+      Array.from(el.children).forEach((child,i)=>{child.classList.add("reveal");child.style.transitionDelay=`${i*110}ms`;observer.observe(child);});
+      return;
+    }
+    el.classList.add("reveal");el.dataset.revealDelay=String((index%4)+1);observer.observe(el);
+  });
+  document.querySelectorAll(".couple,.countdown,.event,.rsvp,.wishes,.gift,.closing").forEach(sec=>{const d=document.createElement("div");d.className="batik-divider";d.setAttribute("aria-hidden","true");sec.prepend(d);});
+  if(!reduceMotion){
+    const heroImage=$("#heroImage");
+    const live=new Set();
+    const seen=new IntersectionObserver(es=>es.forEach(e=>e.isIntersecting?live.add(e.target):live.delete(e.target)),{rootMargin:"20% 0px"});
+    document.querySelectorAll("section").forEach(sec=>seen.observe(sec));
+    let raf=0;
+    const depth=()=>{
+      raf=0;const vh=window.innerHeight;
+      const y=Math.min(window.scrollY,vh)*.055;
+      if(heroImage)heroImage.style.transform=`scale(1.06) translate3d(0, ${y}px, 0)`;
+      live.forEach(sec=>{const r=sec.getBoundingClientRect();const p=(r.top+r.height/2-vh/2)/vh; // -1..1 around screen centre
+        sec.style.setProperty("--drift",`${(p*-40).toFixed(1)}px`);   // gold rings drift against the scroll
+        sec.style.setProperty("--float",`${(p*-14).toFixed(1)}px`);}); // framed portraits / closing photo ease past
+    };
+    window.addEventListener("scroll",()=>{if(!raf)raf=requestAnimationFrame(depth);},{passive:true});
+    depth();
+  }
   loadRemoteWishes();
 })();
