@@ -43,7 +43,10 @@
     img.alt = item.alt;
     img.decoding = "async";
     img.loading = i === 0 ? "eager" : "lazy"; // only the first photo costs bandwidth up front
-    figure.appendChild(img);
+    const frame = document.createElement("div"); // the gold mat hugs the photo, whatever its shape
+    frame.className = "gallery-slide__frame";
+    frame.appendChild(img);
+    figure.appendChild(frame);
     track.appendChild(figure);
   });
 

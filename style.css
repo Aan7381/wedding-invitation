@@ -185,12 +185,6 @@ body.home-entering .hero::after{
 .closing__photo img{translate:0 var(--float,0px);scale:1.06}
 @media(prefers-reduced-motion:reduce){.intro::before,.intro::after,.couple::before,.event::before,.couple-photo-frame,.closing__photo img{translate:none;scale:none}}
 
-/* Gallery mat travels with each photo (anchored to the slide, not the section). */
-.gallery-slide{position:relative}
-.gallery-slide::after{inset:12px 34px;max-width:none}
-@media(min-width:700px){.gallery-slide::after{inset:12px 24px}}
-@media(max-width:380px){.gallery-slide::after{inset:12px 28px}}
-
 /* ===== Gate: batik doors, gunungan arch, wax seal ===== */
 .invitation-gate{background:transparent;perspective:1700px;transition:visibility 0s linear 2.3s}
 .invitation-gate::before,.invitation-gate::after{content:none}
@@ -205,11 +199,11 @@ body.home-entering .hero::after{
 .gate-door--r::after{border-left:0}
 .is-opening .gate-door--l{transform:rotateY(-98deg);opacity:0}
 .is-opening .gate-door--r{transform:rotateY(98deg);opacity:0}
-.invitation-gate__inner{width:min(86vw,400px);min-height:min(80svh,610px);padding:20% 12% 6%;display:grid;align-content:center;justify-items:center;z-index:2;transition:opacity .5s ease,transform .8s ease}
+.invitation-gate__inner{width:min(86vw,420px);min-height:min(82svh,660px);padding:clamp(84px,19svh,150px) 44px 36px;display:grid;align-content:center;justify-items:center;z-index:2;transition:opacity .5s ease,transform .8s ease}
 .is-opening .invitation-gate__inner{opacity:0;transform:scale(1.05)}
 .gate-arch{position:absolute;inset:0;width:100%;height:100%;z-index:-1;fill:rgba(20,21,16,.62);stroke:var(--gold);stroke-opacity:.6;stroke-width:1}
 .gate-arch__inner{fill:none;stroke-opacity:.25}
-.invitation-gate__monogram{margin-bottom:22px}
+.invitation-gate__monogram{margin-bottom:22px;font-size:clamp(56px,15vw,84px)}
 .invitation-gate__rule{margin-bottom:18px}
 .invitation-gate__open{margin-top:26px;background:none;border:0;padding:0;display:grid;justify-items:center;gap:14px;color:var(--paper);border-radius:12px;letter-spacing:normal;text-transform:none}
 .invitation-gate__open:hover{background:none;transform:none}
@@ -230,15 +224,37 @@ body.home-entering .hero::after{
 .section-accent{background-image:url(assets/ornaments/kawung-soft.svg);background-size:48px 48px}
 
 /* ===== Ambient: vignette, grain, dust ===== */
-.hero__veil{background:radial-gradient(ellipse at 50% 42%,transparent 48%,rgba(0,0,0,.5) 100%),linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.72))}
-.closing__photo::after{background:radial-gradient(ellipse at 50% 40%,transparent 50%,rgba(0,0,0,.45) 100%),linear-gradient(180deg,rgba(20,21,16,.08),rgba(20,21,16,.88))}
+.hero__veil{background:radial-gradient(ellipse at 50% 42%,transparent 58%,rgba(0,0,0,.28) 100%),linear-gradient(180deg,rgba(0,0,0,.35),rgba(0,0,0,.72))}
+.closing__photo::after{background:radial-gradient(ellipse at 50% 40%,transparent 58%,rgba(0,0,0,.3) 100%),linear-gradient(180deg,rgba(20,21,16,.08),rgba(20,21,16,.88))}
 body::after{content:"";position:fixed;inset:0;z-index:101;pointer-events:none;opacity:.1;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:160px 160px}
 .ambient-dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0;transition:opacity 2s ease}
 .ambient-dust.on{opacity:1}
 
-@media(max-width:380px){.invitation-gate__inner{padding:22% 10% 6%}.gate-seal{width:76px;height:76px;font-size:25px}}
+@media(max-width:380px){.invitation-gate__inner{padding:clamp(64px,15svh,110px) 30px 30px}.gate-seal{width:76px;height:76px;font-size:25px}}
 @media(prefers-reduced-motion:reduce){
   .gate-door{transition:opacity .4s ease}.is-opening .gate-door--l,.is-opening .gate-door--r{transform:none}
   .gate-seal::after{animation:none}.is-opening .gate-seal{animation:none;opacity:0}.invitation-gate__inner{transition:opacity .3s}.is-opening .invitation-gate__inner{transform:none}
   .invitation-gate{transition:visibility 0s linear .5s}.ambient-dust{display:none}
 }
+
+/* ===== Desktop / landscape fit ===== */
+@media(min-aspect-ratio:1/1){
+  .hero h1{font-size:clamp(72px,min(22vw,19svh),180px)}
+  .hero__image{object-position:50% 18%}
+  .hero::after{top:3%;width:72px;height:72px}
+}
+@media(max-height:700px){.hero::after{display:none}}
+
+/* ===== Gallery: mat hugs the photo; desktop shows a centred photo with neighbours peeking ===== */
+.gallery-slide::after{content:none}
+.gallery-slide__frame{position:relative;width:fit-content;max-width:100%}
+.gallery-slide__frame::after{content:"";position:absolute;inset:12px;border:1px solid rgba(178,154,103,.4);pointer-events:none}
+.gallery-slide img{width:auto;max-width:100%;max-height:70svh}
+@media(min-width:700px){
+  .gallery-slider{--slide-w:clamp(360px,40vw,620px)}
+  .gallery-slide{flex:0 0 var(--slide-w);padding:0 14px}
+  .gallery-slider__track{padding:0 calc((100vw - var(--slide-w))/2)}
+  .gallery-slide img{max-height:72svh}
+}
+/* closing text keeps a comfortable margin on wide screens */
+@media(min-width:900px){.closing__content{padding-left:max(24px,7vw);padding-bottom:90px}}
