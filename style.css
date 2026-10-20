@@ -213,8 +213,9 @@ body.home-entering .hero::after{
 .gate-window__ground{position:absolute;inset:0;background:var(--green) url(assets/ornaments/kawung-soft.svg) 0 0/48px 48px;transition:opacity 1s ease .25s}
 .is-split .gate-window__ground{opacity:0}
 .kayon{position:absolute;top:0;height:100%;width:50%;backface-visibility:hidden;filter:drop-shadow(0 1.5px 1px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(178,154,103,.2));transition:transform 1.25s cubic-bezier(.6,0,.2,1)}
-.kayon--l{left:0;transform-origin:0 50%}
-.kayon--r{right:0;transform-origin:100% 50%}
+.kayon{object-fit:contain;user-select:none;-webkit-user-drag:none}
+.kayon--l{left:0;transform-origin:0 50%;object-position:100% 50%}
+.kayon--r{right:0;transform-origin:100% 50%;object-position:0% 50%}
 .is-split .kayon--l{transform:rotateY(-102deg)}
 .is-split .kayon--r{transform:rotateY(102deg)}
 .gate-frame{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
