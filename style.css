@@ -185,39 +185,57 @@ body.home-entering .hero::after{
 .closing__photo img{translate:0 var(--float,0px);scale:1.06}
 @media(prefers-reduced-motion:reduce){.intro::before,.intro::after,.couple::before,.event::before,.couple-photo-frame,.closing__photo img{translate:none;scale:none}}
 
-/* ===== Gate: batik doors, gunungan arch, wax seal ===== */
-.invitation-gate{background:transparent;perspective:1700px;transition:visibility 0s linear 2.3s}
+/* ===== Opening: photo cover -> gunungan in an arch frame -> doors split -> photo fills the screen ===== */
+:root{--script:"Pinyon Script","Great Vibes","Snell Roundhand",cursive}
+.invitation-gate{background:var(--ink);overflow:hidden;transition:opacity .9s ease,visibility 0s linear .9s}
 .invitation-gate::before,.invitation-gate::after{content:none}
-.invitation-gate.is-opening{opacity:1;visibility:hidden;pointer-events:none}
-.gate-door{position:absolute;top:0;bottom:0;width:50.4%;z-index:0;background:#141510 url(assets/ornaments/kawung.svg) 0 0/48px 48px;backface-visibility:hidden;transition:transform 1.5s cubic-bezier(.65,0,.2,1) .35s,opacity .35s ease 1.5s}
-.gate-door::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,21,16,0) 55%,rgba(0,0,0,.55))}
-.gate-door::after{content:"";position:absolute;inset:16px;border:1px solid rgba(178,154,103,.28)}
-.gate-door--l{left:0;transform-origin:0 50%}
-.gate-door--l::after{border-right:0}
-.gate-door--r{right:0;transform-origin:100% 50%}
-.gate-door--r::before{transform:scaleX(-1)}
-.gate-door--r::after{border-left:0}
-.is-opening .gate-door--l{transform:rotateY(-98deg);opacity:0}
-.is-opening .gate-door--r{transform:rotateY(98deg);opacity:0}
-.invitation-gate__inner{width:min(86vw,420px);min-height:min(82svh,660px);padding:clamp(84px,19svh,150px) 44px 36px;display:grid;align-content:center;justify-items:center;z-index:2;transition:opacity .5s ease,transform .8s ease}
-.is-opening .invitation-gate__inner{opacity:0;transform:scale(1.05)}
-.gate-arch{position:absolute;inset:0;width:100%;height:100%;z-index:-1;fill:rgba(20,21,16,.62);stroke:var(--gold);stroke-opacity:.6;stroke-width:1}
-.gate-arch__inner{fill:none;stroke-opacity:.25}
-.invitation-gate__monogram{margin-bottom:22px;font-size:clamp(56px,15vw,84px)}
-.invitation-gate__rule{margin-bottom:18px}
-.invitation-gate__open{margin-top:26px;background:none;border:0;padding:0;display:grid;justify-items:center;gap:14px;color:var(--paper);border-radius:12px;letter-spacing:normal;text-transform:none}
-.invitation-gate__open:hover{background:none;transform:none}
-.invitation-gate__open:focus-visible{outline:none}
-.invitation-gate__open:focus-visible .gate-seal{outline:2px solid var(--paper);outline-offset:8px}
-.gate-seal{position:relative;width:86px;height:86px;display:grid;place-items:center;border-radius:48% 52% 50% 50%/52% 48% 52% 48%;background:radial-gradient(circle at 35% 28%,#dcc794,#b29a67 52%,#8a7444);color:#141510;font:italic 500 28px/1 var(--serif);letter-spacing:.02em;box-shadow:0 10px 24px rgba(0,0,0,.5),inset 0 0 0 5px rgba(255,255,255,.07),inset 0 -5px 9px rgba(0,0,0,.28);transition:transform .35s}
-.gate-seal::before{content:"";position:absolute;inset:9px;border:1px solid rgba(20,21,16,.4);border-radius:inherit}
-.gate-seal::after{content:"";position:absolute;inset:-6px;border:1px solid rgba(178,154,103,.7);border-radius:inherit;animation:sealPulse 2.8s ease-out infinite}
-.invitation-gate__open:hover .gate-seal{transform:scale(1.06) rotate(-3deg)}
-.gate-cap{font-size:10px;letter-spacing:.22em;text-transform:uppercase;opacity:.82}
-.is-opening .gate-seal{animation:sealPop .5s cubic-bezier(.5,0,.8,.4) forwards}
-.is-opening .gate-seal::after{animation:none;opacity:0}
-@keyframes sealPulse{0%{transform:scale(.92);opacity:.8}100%{transform:scale(1.35);opacity:0}}
-@keyframes sealPop{35%{transform:scale(1.16)}100%{transform:scale(0);opacity:0}}
+.invitation-gate.is-opening{opacity:1;visibility:visible;pointer-events:auto}
+.invitation-gate.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.gate-ground{position:absolute;inset:0;background:var(--green) url(assets/ornaments/kawung-soft.svg) 0 0/48px 48px}
+.gate-photo{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,21,16,.35),rgba(20,21,16,.82)),url(assets/images/hero.jpg) 50% 20%/cover;filter:saturate(.7);transition:opacity .9s ease}
+.is-opening .gate-photo{opacity:0}
+.gate-cover{position:relative;z-index:3;align-self:end;padding-bottom:max(44px,10svh);width:min(88vw,520px);text-align:center;display:grid;justify-items:center;gap:0;transition:opacity .6s ease,transform .8s ease}
+.is-opening .gate-cover{opacity:0;transform:translateY(-10px);pointer-events:none}
+.gate-cover__eyebrow{font:500 clamp(13px,3.6vw,17px)/1.2 var(--serif);letter-spacing:.24em;color:var(--paper);opacity:.9;margin-bottom:6px}
+.gate-cover__names{margin:0;font:400 clamp(80px,26vw,150px)/1.02 var(--script);color:var(--paper);display:grid;text-shadow:0 6px 30px rgba(0,0,0,.45)}
+.gate-cover__names span{display:block}
+.gate-cover__names span:last-child{margin-top:-.06em}
+.invitation-gate__guest{margin:14px 0 0;color:var(--gold);font:500 clamp(18px,5vw,24px)/1.2 var(--serif);letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.invitation-gate__open{margin-top:30px;min-width:200px;min-height:52px;padding:0 30px;border:0;border-radius:999px;background:var(--paper);color:var(--ink);font:600 14px/1 var(--sans);letter-spacing:.06em;text-transform:none;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+.invitation-gate__open:hover{background:var(--paper);transform:translateY(-3px);box-shadow:0 16px 36px rgba(0,0,0,.45)}
+.invitation-gate__open:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+/* stage */
+.gate-box{--bw:min(88vw,calc(86svh*200/354),520px);position:absolute;z-index:2;left:50%;top:50%;width:var(--bw);height:calc(var(--bw)*354/200);translate:-50% -50%;scale:.95;opacity:0;transition:opacity 1s ease,scale 1.1s cubic-bezier(.2,.7,.2,1);pointer-events:none}
+.is-kayon .gate-box{opacity:1;scale:1}
+.is-grow .gate-box{scale:var(--cover,3);transition:scale 1.5s cubic-bezier(.6,0,.25,1)}
+.gate-window{position:absolute;left:11%;top:10.17%;width:78%;height:85.88%;border-radius:50% 50% 0 0/25.66% 25.66% 0 0;overflow:hidden;perspective:900px;background:var(--green)}
+.gate-window__photo{position:absolute;inset:0;background:url(assets/images/hero.jpg) 50% 22%/cover;filter:brightness(.8) saturate(.9)}
+.gate-window__ground{position:absolute;inset:0;background:var(--green) url(assets/ornaments/kawung-soft.svg) 0 0/48px 48px;transition:opacity 1s ease .25s}
+.is-split .gate-window__ground{opacity:0}
+.kayon{position:absolute;top:0;height:100%;width:50%;backface-visibility:hidden;filter:drop-shadow(0 1.5px 1px rgba(0,0,0,.55)) drop-shadow(0 0 8px rgba(178,154,103,.2));transition:transform 1.25s cubic-bezier(.6,0,.2,1)}
+.kayon--l{left:0;transform-origin:0 50%}
+.kayon--r{right:0;transform-origin:100% 50%}
+.is-split .kayon--l{transform:rotateY(-102deg)}
+.is-split .kayon--r{transform:rotateY(102deg)}
+.gate-frame{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}
+@media(max-width:380px){.gate-cover__names{font-size:clamp(70px,24vw,100px)}}
+.gate-cover__names .amp,.hero h1 i{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--gold)}
+.gate-cover__names .amp{display:inline;font-size:.5em;margin:0 0 0 .08em}
+@media(prefers-reduced-motion:reduce){.invitation-gate{transition:opacity .4s ease,visibility 0s linear .4s}.ambient-dust{display:none}}
+
+/* ===== Headlines in handwriting script ===== */
+h1,h2,.names h3,.event-card h3,.closing h2{font-family:var(--script);font-weight:400;letter-spacing:0;line-height:1.08}
+h3.eyebrow{font-family:var(--sans);font-weight:600;line-height:1.4}
+h2{font-size:clamp(50px,14vw,92px)}
+h2 em{font-style:normal;color:var(--gold);white-space:nowrap}
+.section-light h2 em{color:#8a7444}
+.hero h1{font-size:clamp(64px,19vw,150px);line-height:.98}
+.hero h1 i{font-size:.5em;line-height:.8}
+.countdown h2,.closing h2{font-size:clamp(50px,14vw,96px)}
+.closing h2{font-size:clamp(56px,15vw,108px)}
+.names h3{font-size:clamp(40px,10vw,54px);line-height:1.1}
+.event-card h3{font-size:clamp(38px,9vw,50px)}
+@media(min-aspect-ratio:1/1){.hero h1{font-size:clamp(64px,min(18vw,17svh),150px)}}
 
 /* ===== Batik layer ===== */
 .batik-divider{position:absolute;top:0;left:0;right:0;height:14px;z-index:1;pointer-events:none;background:url(assets/ornaments/tumpal.svg) repeat-x center top/28px 14px}
@@ -230,12 +248,6 @@ body::after{content:"";position:fixed;inset:0;z-index:101;pointer-events:none;op
 .ambient-dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0;transition:opacity 2s ease}
 .ambient-dust.on{opacity:1}
 
-@media(max-width:380px){.invitation-gate__inner{padding:clamp(64px,15svh,110px) 30px 30px}.gate-seal{width:76px;height:76px;font-size:25px}}
-@media(prefers-reduced-motion:reduce){
-  .gate-door{transition:opacity .4s ease}.is-opening .gate-door--l,.is-opening .gate-door--r{transform:none}
-  .gate-seal::after{animation:none}.is-opening .gate-seal{animation:none;opacity:0}.invitation-gate__inner{transition:opacity .3s}.is-opening .invitation-gate__inner{transform:none}
-  .invitation-gate{transition:visibility 0s linear .5s}.ambient-dust{display:none}
-}
 
 /* ===== Desktop / landscape fit ===== */
 @media(min-aspect-ratio:1/1){

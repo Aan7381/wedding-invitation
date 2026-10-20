@@ -34,24 +34,25 @@
   gate.className = "invitation-gate";
   gate.setAttribute("role", "dialog");
   gate.setAttribute("aria-label", "Wedding invitation cover");
-  // Two batik doors + a gunungan (wayang mountain) arch holding the cover text and a gold wax seal.
+  const firstNames = [C.couple.bride.split(" ")[0], C.couple.groom.split(" ")[0]];
+  // Cover (photo + script names) -> tap -> carved gunungan inside an arch frame -> it splits open -> the photo fills the screen.
   gate.innerHTML = `
-    <div class="gate-door gate-door--l" aria-hidden="true"></div>
-    <div class="gate-door gate-door--r" aria-hidden="true"></div>
-    <div class="invitation-gate__inner">
-      <svg class="gate-arch" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path d="M100 4C107 38 150 58 171 110C191 160 187 232 181 296H19C13 232 9 160 29 110C50 58 93 38 100 4Z" vector-effect="non-scaling-stroke"/>
-        <path class="gate-arch__inner" d="M100 22C106 50 140 68 158 114C174 158 171 226 166 284H34C29 226 26 158 42 114C60 68 94 50 100 22Z" vector-effect="non-scaling-stroke"/>
-      </svg>
-      <div class="invitation-gate__monogram">I & A</div>
-      <div class="invitation-gate__rule"></div>
-      <p>THE WEDDING OF</p>
-      <h2>Isti & Adrian</h2>
-      ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
-      <button class="invitation-gate__open" type="button">
-        <span class="gate-seal" aria-hidden="true">I&A</span>
-        <span class="gate-cap">Buka Undangan</span>
-      </button>
+    <div class="gate-ground" aria-hidden="true"></div>
+    <div class="gate-photo" aria-hidden="true"></div>
+    <div class="gate-box" aria-hidden="true">
+      <div class="gate-window">
+        <div class="gate-window__photo"></div>
+        <div class="gate-window__ground"></div>
+        <svg class="kayon kayon--l" viewBox="0 0 100 345" preserveAspectRatio="xMaxYMid meet"><use href="#kayon-half"/></svg>
+        <svg class="kayon kayon--r" viewBox="0 0 100 345" preserveAspectRatio="xMinYMid meet"><use href="#kayon-half" transform="translate(100 0) scale(-1 1)"/></svg>
+      </div>
+      <svg class="gate-frame" viewBox="0 -14 200 354"><use href="#arch-frame"/></svg>
+    </div>
+    <div class="gate-cover">
+      <div class="gate-cover__eyebrow">THE WEDDING OF</div>
+      <h2 class="gate-cover__names"><span>${escapeHTML(firstNames[0])} <i class="amp">&amp;</i></span><span>${escapeHTML(firstNames[1])}</span></h2>
+      ${guestName ? `<div class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</div>` : ""}
+      <button class="invitation-gate__open" type="button">Buka Undangan</button>
     </div>`;
   document.body.prepend(gate);
   document.body.classList.add("is-locked");
@@ -104,12 +105,26 @@
   const openButton=$(".invitation-gate__open");
   openButton.addEventListener("click",async()=>{
     openButton.disabled=true;
-    gate.classList.add("is-opening");            // seal pops, text fades, doors swing (CSS)
     document.body.classList.remove("is-locked");
-    setTimeout(()=>document.body.classList.add("home-entering"),450); // hero reveal starts as the doors part
+    const timers=[];const at=(ms,fn)=>timers.push(setTimeout(fn,ms));
+    const enterHome=()=>{document.body.classList.add("home-entering");at(3800,()=>document.body.classList.add("home-entered"));};
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      gate.classList.add("is-opening","is-leaving");enterHome();setTimeout(()=>gate.remove(),700);await startMusic();return;
+    }
+    const win=gate.querySelector(".gate-window");
+    gate.style.setProperty("--cover",(Math.max(innerWidth/win.offsetWidth,innerHeight/win.offsetHeight)*1.5).toFixed(2));
+    gate.classList.add("is-opening");                       // cover text fades, photo melts into the ground
+    at(700,()=>gate.classList.add("is-kayon"));              // gunungan + frame appear
+    at(2300,()=>gate.classList.add("is-split"));             // gunungan opens like doors
+    at(2900,()=>gate.classList.add("is-grow"));              // the window grows to fill the screen
+    at(4300,()=>{gate.classList.add("is-leaving");enterHome();}); // hand over to the hero reveal
+    at(5400,()=>gate.remove());
+    at(500,()=>gate.addEventListener("click",()=>{           // tap anywhere to skip the rest
+      if(gate.classList.contains("is-leaving"))return;
+      timers.splice(0).forEach(clearTimeout);
+      gate.classList.add("is-kayon","is-split","is-grow","is-leaving");enterHome();setTimeout(()=>gate.remove(),1000);
+    }));
     await startMusic();
-    setTimeout(()=>gate.remove(),2400);
-    setTimeout(()=>document.body.classList.add("home-entered"),4300);
   });
   startMusic();["pointerdown","touchstart","keydown"].forEach(eventName=>window.addEventListener(eventName,()=>{if(audio.paused)startMusic();},{once:true,passive:true}));
   musicButton.addEventListener("click",async()=>{try{if(audio.paused)await startMusic();else{audio.pause();musicButton.setAttribute("aria-pressed","false");musicButton.setAttribute("aria-label","Play wedding music");musicControl.classList.remove("playing");}}catch{status.textContent="Tap the music button again to start the song.";}});
