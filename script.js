@@ -32,14 +32,26 @@
 
   const gate = document.createElement("div");
   gate.className = "invitation-gate";
+  gate.setAttribute("role", "dialog");
+  gate.setAttribute("aria-label", "Wedding invitation cover");
+  // Two batik doors + a gunungan (wayang mountain) arch holding the cover text and a gold wax seal.
   gate.innerHTML = `
+    <div class="gate-door gate-door--l" aria-hidden="true"></div>
+    <div class="gate-door gate-door--r" aria-hidden="true"></div>
     <div class="invitation-gate__inner">
+      <svg class="gate-arch" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path d="M100 4C107 38 150 58 171 110C191 160 187 232 181 296H19C13 232 9 160 29 110C50 58 93 38 100 4Z" vector-effect="non-scaling-stroke"/>
+        <path class="gate-arch__inner" d="M100 22C106 50 140 68 158 114C174 158 171 226 166 284H34C29 226 26 158 42 114C60 68 94 50 100 22Z" vector-effect="non-scaling-stroke"/>
+      </svg>
       <div class="invitation-gate__monogram">I & A</div>
       <div class="invitation-gate__rule"></div>
       <p>THE WEDDING OF</p>
       <h2>Isti & Adrian</h2>
       ${guestName ? `<p class="invitation-gate__guest">Dear, ${escapeHTML(guestName)}</p>` : ""}
-      <button class="invitation-gate__open" type="button">Buka Undangan</button>
+      <button class="invitation-gate__open" type="button">
+        <span class="gate-seal" aria-hidden="true">I&A</span>
+        <span class="gate-cap">Buka Undangan</span>
+      </button>
     </div>`;
   document.body.prepend(gate);
   document.body.classList.add("is-locked");
@@ -91,12 +103,13 @@
   async function startMusic(){try{await audio.play();musicButton.setAttribute("aria-pressed","true");musicButton.setAttribute("aria-label","Pause wedding music");musicControl.classList.add("playing");return true;}catch{return false;}}
   const openButton=$(".invitation-gate__open");
   openButton.addEventListener("click",async()=>{
-    document.body.classList.add("home-entering");
+    openButton.disabled=true;
+    gate.classList.add("is-opening");            // seal pops, text fades, doors swing (CSS)
     document.body.classList.remove("is-locked");
-    gate.classList.add("is-opening");
+    setTimeout(()=>document.body.classList.add("home-entering"),450); // hero reveal starts as the doors part
     await startMusic();
-    setTimeout(()=>gate.remove(),1200);
-    setTimeout(()=>document.body.classList.add("home-entered"),3800);
+    setTimeout(()=>gate.remove(),2400);
+    setTimeout(()=>document.body.classList.add("home-entered"),4300);
   });
   startMusic();["pointerdown","touchstart","keydown"].forEach(eventName=>window.addEventListener(eventName,()=>{if(audio.paused)startMusic();},{once:true,passive:true}));
   musicButton.addEventListener("click",async()=>{try{if(audio.paused)await startMusic();else{audio.pause();musicButton.setAttribute("aria-pressed","false");musicButton.setAttribute("aria-label","Play wedding music");musicControl.classList.remove("playing");}}catch{status.textContent="Tap the music button again to start the song.";}});
@@ -112,6 +125,7 @@
     }
     el.classList.add("reveal");el.dataset.revealDelay=String((index%4)+1);observer.observe(el);
   });
+  document.querySelectorAll(".couple,.countdown,.event,.rsvp,.wishes,.gift,.closing").forEach(sec=>{const d=document.createElement("div");d.className="batik-divider";d.setAttribute("aria-hidden","true");sec.prepend(d);});
   if(!reduceMotion){
     const heroImage=$("#heroImage");
     const live=new Set();
