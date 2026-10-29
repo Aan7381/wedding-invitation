@@ -281,3 +281,7 @@ body::after{content:"";position:fixed;inset:0;z-index:101;pointer-events:none;op
 .date-lockup__day{font:500 clamp(76px,23vw,124px)/.86 var(--serif);color:var(--dl-day);font-variant-numeric:lining-nums;letter-spacing:0;text-shadow:0 6px 28px rgba(0,0,0,.18)}
 .section-light .date-lockup__day{text-shadow:none}
 @media(min-width:700px){.date-lockup{margin-top:72px}.section-light .date-lockup{margin-top:40px}}
+
+/* date sits between the countdown heading and the numbers */
+.countdown .date-lockup{margin:30px auto 34px}
+@media(min-width:700px){.countdown .date-lockup{margin:34px auto 40px}}
