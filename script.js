@@ -62,7 +62,7 @@
   text("heroDate", C.event.shortDateLabel || "15. 11. 2026");
   text("eventDate", C.event.dateLabel);
   try { // date lock-ups are filled from config (Jakarta time), static markup stays as fallback
-    const d = new Date(C.event.startISO), f = o => new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", ...o }).format(d);
+    const d = new Date(C.event.startISO), f = o => new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jakarta", ...o }).format(d);
     const parts = { weekday: f({ weekday: "long" }), day: f({ day: "numeric" }), month: f({ month: "long" }), year: f({ year: "numeric" }) };
     document.querySelectorAll(".date-lockup").forEach(el => {
       el.setAttribute("aria-label", `${parts.weekday}, ${parts.day} ${parts.month} ${parts.year}`);

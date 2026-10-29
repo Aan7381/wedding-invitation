@@ -9,7 +9,7 @@ window.WEDDING_CONFIG = {
   },
 
   event: {
-    dateLabel: "Minggu, 15 November 2026",
+    dateLabel: "Sunday, 15 November 2026",
     shortDateLabel: "15. 11. 2026",
     timeLabel: "10.00 WIB",
     startISO: "2026-11-15T10:00:00+07:00",
