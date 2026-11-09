@@ -17,7 +17,7 @@ window.WEDDING_CONFIG = {
     title: "The Wedding of Isti & Adrian",
     venue: "The Bride's Family Home",
     address: "Bugel Mas Indah, Jl Pasundan Blok D2 No 21 RT:06/RW:05 Kel. Bugel, Kec. Karawaci, Kota Tangerang",
-    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bugel+Mas+Indah+Jalan+Pasundan+Blok+D2+No+21+RT%3A06%2FRW%3A05+Kel.+Bugel+Kec.+Karawaci+Kota+Tangerang",
+    mapsUrl: "https://maps.app.goo.gl/AL2mMsvHjFWZb9jo7",
     calendarDescription: "We would be honored to celebrate this special day with you.\n\nThe Wedding of Isti & Adrian"
   },
 
