@@ -11,9 +11,9 @@ window.WEDDING_CONFIG = {
   event: {
     dateLabel: "Sunday, 15 November 2026",
     shortDateLabel: "15. 11. 2026",
-    timeLabel: "10.00 WIB",
-    startISO: "2026-11-15T10:00:00+07:00",
-    endISO: "2026-11-15T14:00:00+07:00",
+    timeLabel: "10.30 WIB",
+    startISO: "2026-11-15T10:30:00+07:00",
+    endISO: "2026-11-15T15:00:00+07:00",
     title: "The Wedding of Isti & Adrian",
     venue: "The Bride's Family Home",
     address: "Bugel Mas Indah, Jl Pasundan Blok D2 No 21 RT:06/RW:05 Kel. Bugel, Kec. Karawaci, Kota Tangerang",
